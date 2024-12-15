@@ -1,0 +1,6 @@
+[submodule "modules/gdscript-language-server"]
+	path = modules/gdscript-language-server
+	url = https://github.com/bdunks/gdscript-language-server
+[submodule "modules/godot_voxel"]
+	path = modules/godot_voxel
+	url = https://github.com/jkotrc/godot_voxel
