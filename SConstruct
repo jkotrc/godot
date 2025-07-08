@@ -13,6 +13,7 @@ import time
 from collections import OrderedDict
 from importlib.util import module_from_spec, spec_from_file_location
 from types import ModuleType
+# import scons_compiledb
 
 from SCons import __version__ as scons_raw_version
 
@@ -143,6 +144,9 @@ elif os.name == "nt" and methods.get_cmdline_bool("use_mingw", False):
 # want to have to pull in manually.
 # Then we prepend PATH to make it take precedence, while preserving SCons' own entries.
 env = Environment(tools=custom_tools)
+env["CXX"] = "clang++"
+env["CC"] = "clang"
+# scons_compiledb.enable_with_cmdline(env)
 env.PrependENVPath("PATH", os.getenv("PATH"))
 env.PrependENVPath("PKG_CONFIG_PATH", os.getenv("PKG_CONFIG_PATH"))
 if "TERM" in os.environ:  # Used for colored output.
@@ -415,6 +419,7 @@ for path in module_search_paths:
         # so it can be referenced simply as `#include "summator/summator.h"`
         # independently of where a module is located on user's filesystem.
         env.Prepend(CPPPATH=[path, os.path.dirname(path)])
+    print(f"Detected modules: {modules}")
     # Note: custom modules can override built-in ones.
     modules_detected.update(modules)
 
@@ -594,6 +599,9 @@ if env["production"]:
     # LTO "auto" means we handle the preferred option in each platform detect.py.
     env["lto"] = ARGUMENTS.get("lto", "auto")
 
+###### override to clang++
+# env["CXX"] = "clang++"
+
 # Run SCU file generation script if in a SCU build.
 if env["scu_build"]:
     max_includes_per_scu = 8
@@ -610,7 +618,7 @@ if env["scu_build"]:
 # Must happen after the flags' definition, as configure is when most flags
 # are actually handled to change compile options, etc.
 detect.configure(env)
-
+"clang", ""
 print(f'Building for platform "{env["platform"]}", architecture "{env["arch"]}", target "{env["target"]}".')
 if env.dev_build:
     print("NOTE: Developer build, with debug optimization level and debug symbols (unless overridden).")
@@ -628,6 +636,7 @@ cc_version_major = int(cc_version["major"] or -1)
 cc_version_minor = int(cc_version["minor"] or -1)
 cc_version_metadata1 = cc_version["metadata1"] or ""
 
+#env["CXX"] = "clang++" #desperate. Where the fuck to set this?
 if methods.using_gcc(env):
     if cc_version_major == -1:
         print_warning(
@@ -895,7 +904,9 @@ env.module_icons_paths = []
 env.doc_class_path = platform_doc_class_path
 
 for name, path in modules_detected.items():
+    print(f"Module {name} at {path}")
     if not env["module_" + name + "_enabled"]:
+        print("Not enabled. Skipping")
         continue
     sys.path.insert(0, path)
     env.current_module = name
@@ -913,15 +924,17 @@ for name, path in modules_detected.items():
             doc_path = config.get_doc_path()
             for c in doc_classes:
                 env.doc_class_path[c] = path + "/" + doc_path
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Warning in module {name}: {e}")
         # Get icon paths (if present)
         try:
             icons_path = config.get_icons_path()
             env.module_icons_paths.append(path + "/" + icons_path)
-        except Exception:
+        except Exception as e:
+            print(f"Warning in module {name}: {e}")
             # Default path for module icons
             env.module_icons_paths.append(path + "/" + "icons")
+        print(f"Enabling {name}")
         modules_enabled[name] = path
 
     sys.path.remove(path)

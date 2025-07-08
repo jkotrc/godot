@@ -3,4 +3,7 @@
 	url = https://github.com/bdunks/gdscript-language-server
 [submodule "modules/godot_voxel"]
 	path = modules/godot_voxel
-	url = https://github.com/jkotrc/godot_voxel
+	url = git@github.com:jkotrc/godot_voxel
+[submodule "modules/pavlina"]
+	path = modules/pavlina
+	url = git@github.com:pavlina-gaming/godot_pavlina.git

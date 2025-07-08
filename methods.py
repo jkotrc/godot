@@ -388,7 +388,10 @@ def is_module(path):
     must_exist = ["register_types.h", "SCsub", "config.py"]
     for f in must_exist:
         if not os.path.exists(os.path.join(path, f)):
+            print(f"Not a module: {path}. Reason: {os.path.join(path, f)} no exist")
             return False
+
+    print(f"Yes a module: {path}")
     return True
 
 

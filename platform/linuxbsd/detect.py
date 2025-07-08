@@ -106,8 +106,12 @@ def configure(env: "SConsEnvironment"):
     ## Compiler configuration
 
     if "CXX" in env and "clang" in os.path.basename(env["CXX"]):
+        os.path.basename(env["CXX"])
         # Convenience check to enforce the use_llvm overrides when CXX is clang(++)
         env["use_llvm"] = True
+    else:
+        print(dict(env))
+        raise Exception("Why is CXX option being ignored?")
 
     if env["use_llvm"]:
         if "clang++" not in os.path.basename(env["CXX"]):
