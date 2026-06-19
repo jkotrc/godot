@@ -752,7 +752,7 @@ else:
             # Apple Clang, its linker doesn't like -s.
             env.Append(LINKFLAGS=["-Wl,-S", "-Wl,-x", "-Wl,-dead_strip"])
         else:
-            env.Append(LINKFLAGS=["-s"])
+            pass # env.Append(LINKFLAGS=["-s"])
 
     # Linker needs optimization flags too, at least for Emscripten.
     # For other toolchains, this _may_ be useful for LTO too to disambiguate.
