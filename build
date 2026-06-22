@@ -1,1 +1,26 @@
-scons target=editor precision=double verbose=yes use_llvm=yes compiledb=yes cxxflags="-std=c++20 -w" -j$(nproc) 1>cmp.out 2>cmp.err
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Already in a venv that has scons? Skip activation.
+if [ -n "${VIRTUAL_ENV:-}" ] && command -v scons &>/dev/null; then
+  :
+else
+  # Try the project's .venv created by ./configure.
+  for venv in ".venv" "../.venv"; do
+    if [ -f "$venv/bin/activate" ] && command -v "$venv/bin/scons" &>/dev/null; then
+      source "$venv/bin/activate"
+      break
+    fi
+  done
+  if ! command -v scons &>/dev/null; then
+    echo "ERROR: scons not found. Activate a venv that has scons or create one with:"
+    echo "  python3 -m venv .venv && .venv/bin/pip install scons"
+    exit 1
+  fi
+fi
+
+exec scons target=editor verbose=yes use_llvm=yes compiledb=yes \
+  cache_path=./scons_cache cache_limit=0 \
+  cxxflags="-std=c++20 -w" \
+  -j"$(nproc)" \
+  1>cmp.out 2>cmp.err
