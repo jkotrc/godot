@@ -390,3 +390,5 @@ $RECYCLE.BIN/
 cmp.out
 cmp.err
 nohup.out
+loc/
+scons_cache/
