@@ -143,6 +143,22 @@ env["x86_libtheora_opt_vc"] = False
 # avoid issues when building with different versions of python out of the same directory
 env.SConsignFile(File("#.sconsign{0}.dblite".format(pickle.HIGHEST_PROTOCOL)).abspath)
 
+# Default build configuration when no command-line arguments are provided.
+# Equivalent to: scons target=editor verbose=yes use_llvm=yes compiledb=yes \
+#   cache_path=./scons_cache cache_limit=0 cxxflags="-std=c++20 -w" -j"$(nproc)"
+_DEFAULT_ARGS = {
+    "target": "editor",
+    "verbose": "yes",
+    "use_llvm": "yes",
+    "compiledb": "yes",
+    "cache_path": "./scons_cache",
+    "cache_limit": "0",
+    "cxxflags": "-std=c++20 -w",
+}
+for _key, _value in _DEFAULT_ARGS.items():
+    if _key not in ARGUMENTS:
+        ARGUMENTS[_key] = _value
+
 # Build options
 
 customs = ["custom.py"]
@@ -205,9 +221,9 @@ opts.Add(BoolVariable("ninja_auto_run", "Run ninja automatically after generatin
 opts.Add("ninja_file", "Path to the generated ninja file", "build.ninja")
 opts.Add(BoolVariable("compiledb", "Generate compilation DB (`compile_commands.json`) for external tools", False))
 opts.Add(
-    "num_jobs",
-    "Use up to N jobs when compiling (equivalent to `-j N`). Defaults to max jobs - 1. Ignored if -j is used.",
-    "",
+        "num_jobs",
+        "Use up to N jobs when compiling (equivalent to `-j N`). Defaults to max jobs. Ignored if -j is used.",
+        "",
 )
 opts.Add(BoolVariable("verbose", "Enable verbose output for the compilation", False))
 opts.Add(BoolVariable("progress", "Show a progress indicator during compilation", True))
@@ -531,9 +547,9 @@ if env.GetOption("num_jobs") == altered_num_jobs:
                 "Couldn't auto-detect CPU count to configure build parallelism. Specify it with the `-j` or `num_jobs` arguments."
             )
         else:
-            safer_cpu_count = cpu_count if cpu_count <= 4 else cpu_count - 1
+            safer_cpu_count = cpu_count
             print(
-                "Auto-detected %d CPU cores available for build parallelism. Using %d cores by default. You can override it with the `-j` or `num_jobs` arguments."
+                "Auto-detected %d CPU cores available for build parallelism. Using all %d cores by default. You can override it with the `-j` or `num_jobs` arguments."
                 % (cpu_count, safer_cpu_count)
             )
             env.SetOption("num_jobs", safer_cpu_count)
