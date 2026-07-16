@@ -1,9 +1,3 @@
-[submodule "modules/voxel"]
-	path = modules/voxel
-	url = git@github.com:jkotrc/godot_voxel.git
-[submodule "modules/pavlina"]
-	path = modules/pavlina
-	url = git@github.com:pavlina-gaming/godot_pavlina.git
 [submodule "modules/language_server"]
 	path = modules/language_server
 	url = https://github.com/bdunks/gdscript-language-server
